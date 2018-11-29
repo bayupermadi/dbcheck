@@ -6,14 +6,14 @@ import (
 	"os"
 	"strings"
 
-	_ "github.com/onkiit/dbcheck/db/bolt"
-	_ "github.com/onkiit/dbcheck/db/cassandra"
-	_ "github.com/onkiit/dbcheck/db/mongo"
-	_ "github.com/onkiit/dbcheck/db/mysql"
-	_ "github.com/onkiit/dbcheck/db/psql"
-	_ "github.com/onkiit/dbcheck/db/redis"
-	_ "github.com/onkiit/dbcheck/db/sqlite"
-	"github.com/onkiit/dbcheck/registry"
+	_ "github.com/bayupermadi/dbcheck/db/bolt"
+	_ "github.com/bayupermadi/dbcheck/db/cassandra"
+	_ "github.com/bayupermadi/dbcheck/db/mongo"
+	_ "github.com/bayupermadi/dbcheck/db/mysql"
+	_ "github.com/bayupermadi/dbcheck/db/psql"
+	_ "github.com/bayupermadi/dbcheck/db/redis"
+	_ "github.com/bayupermadi/dbcheck/db/sqlite"
+	"github.com/bayupermadi/dbcheck/registry"
 	"github.com/spf13/viper"
 	"github.com/wjaoss/aws-wrapper/session"
 )
@@ -43,10 +43,10 @@ func dbInfo(db string, host string, path string) {
 		fmt.Println(err)
 		return
 	}
-	/*if err := checker.Health(); err != nil {
+	if err := checker.Health(); err != nil {
 		fmt.Println(err)
 		return
-	}*/
+	}
 }
 
 func main() {

@@ -1,0 +1,12 @@
+---
+app:
+  aws:
+    enabled: true
+    credential:
+      id-key: "your ID"
+      secret-key: "your secret"
+      region: "your region"
+    service:
+      cloudwatch:
+        enabled: true
+---
