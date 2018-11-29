@@ -4,16 +4,18 @@ import (
 	"database/sql"
 	"errors"
 	"fmt"
+	"strings"
 
-	_ "github.com/lib/pq"
-	"github.com/onkiit/dbcheck"
-	"github.com/onkiit/dbcheck/registry"
+	"github.com/bayupermadi/dbcheck"
+	"github.com/bayupermadi/dbcheck/registry"
+	"github.com/lib/pq"
 	"github.com/spf13/viper"
 	"github.com/wjaoss/aws-wrapper/tools"
 )
 
 type psql struct {
-	DB *sql.DB
+	DB     *sql.DB
+	DBName string
 }
 
 func (p *psql) Version() error {
@@ -39,38 +41,35 @@ func (p *psql) ActiveClient() error {
 		return err
 	}
 
-	info := fmt.Sprintf("active_client(s): %s", host)
+	info := fmt.Sprintf("active_client(s): %d", count)
 	fmt.Println(info)
 
-	if viper.GetBool("app.aws.service.cloudwatch.enabled") == true {
-		tools.CW("PostgreSQL", "Hosts", "Count", float64(count), "Active Connection", host)
-
-		fmt.Println("bayu")
-	}
+	// if viper.GetBool("app.aws.service.cloudwatch.enabled") == true {
+	// 	tools.CW("PostgreSQL", "Hosts", "Count", float64(count), "Active Connection", host)
+	// }
 
 	return nil
 }
 
 func (p *psql) Health() error {
-	var datname, size string
+	var size int
 
-	rows, err := p.DB.Query("select datname, pg_size_pretty(pg_database_size(datname)) as size from pg_database order by pg_database_size(datname) desc;")
+	err := p.DB.QueryRow("select pg_database_size('" + p.DBName + "') as size;").Scan(&size)
 	if err != nil {
 		return err
 	}
 
-	info := "health_status: \n Database Information \n"
-	for rows.Next() {
-		if err := rows.Scan(&datname, &size); err != nil {
-			return err
-		}
-		info += "  DB Name: " + datname + "\t\tSize: " + size + "\n"
-	}
+	info := fmt.Sprintf("health_status: \n Database Information \n DBName: %s\t DBSize: %d\n", p.DBName, size)
 	fmt.Print(info)
 
-	if err := p.getTableSize(); err != nil {
-		return err
+	if viper.GetBool("app.aws.service.cloudwatch.enabled") == true {
+		tools.CW("PostgreSQL", "DB Name", "Megabytes", float64(size), "DB Size", p.DBName)
 	}
+
+	//if err := p.getTableSize(); err != nil {
+	//	return err
+	//}
+
 	return nil
 }
 
@@ -137,7 +136,11 @@ func (p *psql) Dial(host string) dbcheck.Checker {
 		return nil
 	}
 
-	return &psql{DB: db}
+	str, _ := pq.ParseURL(host)
+	arr := strings.Split(str, " ")
+	dbname := strings.Split(arr[0], "=")[1]
+
+	return &psql{DB: db, DBName: dbname}
 }
 
 func init() {

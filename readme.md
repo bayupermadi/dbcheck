@@ -14,13 +14,13 @@ Before use this tool, you need some packages installed on your system.
 ### Using this tool
 Get this tool by execute this command
 ```
-go get github.com/onkiit/dbcheck
+go get github.com/bayupermadi/dbcheck
 ```
 
 With go, you can simply get all required packages by its tool with a single command.
 First go to root project:
 ```
-cd $(go env GOPATH)/src/github.com/onkiit/dbcheck
+cd $(go env GOPATH)/src/github.com/bayupermadi/dbcheck
 
 ```
 then hit: 
@@ -31,7 +31,7 @@ go get -v -u
 To build this tool, you can follow this command below
 
 ```
-cd $(go env GOPATH)/src/github.com/onkiit/dbcheck/cmd/dbinfo
+cd $(go env GOPATH)/src/github.com/bayupermadi/dbcheck/cmd/dbinfo
 go build
 ```
 

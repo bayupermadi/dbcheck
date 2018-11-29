@@ -5,9 +5,9 @@ import (
 	"fmt"
 
 	//sqlite3 driver
+	"github.com/bayupermadi/dbcheck"
+	"github.com/bayupermadi/dbcheck/registry"
 	_ "github.com/mattn/go-sqlite3"
-	"github.com/onkiit/dbcheck"
-	"github.com/onkiit/dbcheck/registry"
 )
 
 type sqlite struct {

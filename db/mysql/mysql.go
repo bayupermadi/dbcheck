@@ -4,9 +4,9 @@ import (
 	"database/sql"
 	"fmt"
 
+	"github.com/bayupermadi/dbcheck"
+	"github.com/bayupermadi/dbcheck/registry"
 	_ "github.com/go-sql-driver/mysql"
-	"github.com/onkiit/dbcheck"
-	"github.com/onkiit/dbcheck/registry"
 )
 
 type mysql struct {

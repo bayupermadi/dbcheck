@@ -4,9 +4,9 @@ import (
 	"fmt"
 	"os/exec"
 
+	"github.com/bayupermadi/dbcheck"
+	"github.com/bayupermadi/dbcheck/registry"
 	"github.com/gocql/gocql"
-	"github.com/onkiit/dbcheck"
-	"github.com/onkiit/dbcheck/registry"
 )
 
 type cassandra struct {

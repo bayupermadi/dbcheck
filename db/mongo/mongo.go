@@ -3,8 +3,8 @@ package mongo
 import (
 	"fmt"
 
-	"github.com/onkiit/dbcheck"
-	"github.com/onkiit/dbcheck/registry"
+	"github.com/bayupermadi/dbcheck"
+	"github.com/bayupermadi/dbcheck/registry"
 
 	"github.com/globalsign/mgo"
 	"github.com/globalsign/mgo/bson"

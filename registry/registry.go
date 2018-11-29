@@ -1,7 +1,7 @@
 package registry
 
 import (
-	"github.com/onkiit/dbcheck"
+	"github.com/bayupermadi/dbcheck"
 )
 
 var (

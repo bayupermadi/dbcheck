@@ -4,9 +4,9 @@ import (
 	"fmt"
 	"time"
 
+	"github.com/bayupermadi/dbcheck"
+	"github.com/bayupermadi/dbcheck/registry"
 	"github.com/boltdb/bolt"
-	"github.com/onkiit/dbcheck"
-	"github.com/onkiit/dbcheck/registry"
 )
 
 type boltdb struct {

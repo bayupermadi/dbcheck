@@ -6,8 +6,8 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/onkiit/dbcheck"
-	"github.com/onkiit/dbcheck/registry"
+	"github.com/bayupermadi/dbcheck"
+	"github.com/bayupermadi/dbcheck/registry"
 
 	"github.com/gomodule/redigo/redis"
 )
