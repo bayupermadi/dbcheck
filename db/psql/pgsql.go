@@ -8,6 +8,8 @@ import (
 	_ "github.com/lib/pq"
 	"github.com/onkiit/dbcheck"
 	"github.com/onkiit/dbcheck/registry"
+	"github.com/spf13/viper"
+	"github.com/wjaoss/aws-wrapper/tools"
 )
 
 type psql struct {
@@ -24,14 +26,28 @@ func (p *psql) Version() error {
 
 func (p *psql) ActiveClient() error {
 	var count int
+	var host string
 	err := p.DB.QueryRow("SELECT count(0) FROM pg_stat_activity where state='active' ").Scan(&count)
 	if err != nil {
 		fmt.Println(err)
 		return err
 	}
 
-	info := fmt.Sprintf("active_client(s): %d", count)
+	err = p.DB.QueryRow("select inet_server_addr()").Scan(&host)
+	if err != nil {
+		fmt.Println(err)
+		return err
+	}
+
+	info := fmt.Sprintf("active_client(s): %s", host)
 	fmt.Println(info)
+
+	if viper.GetBool("app.aws.service.cloudwatch.enabled") == true {
+		tools.CW("PostgreSQL", "Hosts", "Count", float64(count), "Active Connection", host)
+
+		fmt.Println("bayu")
+	}
+
 	return nil
 }
 

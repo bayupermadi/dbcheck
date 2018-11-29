@@ -14,6 +14,8 @@ import (
 	_ "github.com/onkiit/dbcheck/db/redis"
 	_ "github.com/onkiit/dbcheck/db/sqlite"
 	"github.com/onkiit/dbcheck/registry"
+	"github.com/spf13/viper"
+	"github.com/wjaoss/aws-wrapper/session"
 )
 
 func dbInfo(db string, host string, path string) {
@@ -41,10 +43,10 @@ func dbInfo(db string, host string, path string) {
 		fmt.Println(err)
 		return
 	}
-	if err := checker.Health(); err != nil {
+	/*if err := checker.Health(); err != nil {
 		fmt.Println(err)
 		return
-	}
+	}*/
 }
 
 func main() {
@@ -68,5 +70,23 @@ func main() {
 		}
 	}
 
+	// load configuration file
+	viper.SetConfigName("config")
+	viper.AddConfigPath(".")
+	err := viper.ReadInConfig()
+	if err != nil {
+		panic(fmt.Errorf("fatal error config file: %s", err))
+	}
+
+	// open connection to aws
+	if viper.GetBool("app.aws.enabled") {
+		awsKeyID := viper.Get("app.aws.credential.id-key").(string)
+		awsSecretKey := viper.Get("app.aws.credential.secret-key").(string)
+		awsRegion := viper.Get("app.aws.credential.region").(string)
+
+		session.SetConfiguration(awsKeyID, awsSecretKey, awsRegion)
+	}
+
 	dbInfo(*db, *host, *path)
+
 }
