@@ -9,8 +9,6 @@ import (
 	"github.com/bayupermadi/dbcheck"
 	"github.com/bayupermadi/dbcheck/registry"
 	"github.com/lib/pq"
-	"github.com/spf13/viper"
-	"github.com/wjaoss/aws-wrapper/tools"
 )
 
 type psql struct {
@@ -62,13 +60,13 @@ func (p *psql) Health() error {
 	info := fmt.Sprintf("health_status: \n Database Information \n DBName: %s\t DBSize: %d\n", p.DBName, size)
 	fmt.Print(info)
 
-	if viper.GetBool("app.aws.service.cloudwatch.enabled") == true {
-		tools.CW("PostgreSQL", "DB Name", "Megabytes", float64(size), "DB Size", p.DBName)
-	}
+	// if viper.GetBool("app.aws.service.cloudwatch.enabled") == true {
+	// 	tools.CW("PostgreSQL", "DB Name", "Megabytes", float64(size), "DB Size", p.DBName)
+	// }
 
-	//if err := p.getTableSize(); err != nil {
-	//	return err
-	//}
+	if err := p.getTableSize(); err != nil {
+		return err
+	}
 
 	return nil
 }
@@ -112,8 +110,8 @@ func (p *psql) getTableSize() error {
 		}
 
 		for _, val := range v {
-			qTable := fmt.Sprintf("SELECT pg_size_pretty(pg_total_relation_size('%s.%s')) as tableSize", k, val)
-			qIndex := fmt.Sprintf("SELECT pg_size_pretty(pg_indexes_size('%s.%s')) as indexSize", k, val)
+			qTable := fmt.Sprintf("SELECT pg_total_relation_size('%s.%s') as tableSize", k, val)
+			qIndex := fmt.Sprintf("SELECT pg_indexes_size('%s.%s') as indexSize", k, val)
 			err := p.DB.QueryRow(qTable).Scan(&tableSize)
 			if err != nil {
 				fmt.Println(err)
@@ -125,6 +123,10 @@ func (p *psql) getTableSize() error {
 				return err
 			}
 			fmt.Printf("     Table: %s\n      Table Size: %s\n      Index Size: %s\n", val, tableSize, indexSize)
+
+			// if viper.GetBool("app.aws.service.cloudwatch.enabled") == true {
+			// 	tools.CW("PostgreSQL", "DB Name", "Megabytes", float64(size), "DB Size", p.DBName)
+			// }
 		}
 	}
 	return nil
