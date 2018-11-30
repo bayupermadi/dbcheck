@@ -9,6 +9,8 @@ import (
 	"github.com/bayupermadi/dbcheck"
 	"github.com/bayupermadi/dbcheck/registry"
 	"github.com/lib/pq"
+	"github.com/spf13/viper"
+	"github.com/wjaoss/aws-wrapper/tools"
 )
 
 type psql struct {
@@ -42,9 +44,9 @@ func (p *psql) ActiveClient() error {
 	info := fmt.Sprintf("active_client(s): %d", count)
 	fmt.Println(info)
 
-	// if viper.GetBool("app.aws.service.cloudwatch.enabled") == true {
-	// 	tools.CW("PostgreSQL", "Hosts", "Count", float64(count), "Active Connection", host)
-	// }
+	if viper.GetBool("app.aws.service.cloudwatch.enabled") == true {
+		tools.CW("PostgreSQL", "Hosts", "Count", float64(count), "Active Connection", host)
+	}
 
 	return nil
 }
@@ -60,9 +62,9 @@ func (p *psql) Health() error {
 	info := fmt.Sprintf("health_status: \n Database Information \n DBName: %s\t DBSize: %d\n", p.DBName, size)
 	fmt.Print(info)
 
-	// if viper.GetBool("app.aws.service.cloudwatch.enabled") == true {
-	// 	tools.CW("PostgreSQL", "DB Name", "Megabytes", float64(size), "DB Size", p.DBName)
-	// }
+	if viper.GetBool("app.aws.service.cloudwatch.enabled") == true {
+		tools.CW("PostgreSQL", "DB Name", "Bytes", float64(size), "DB Size", p.DBName)
+	}
 
 	if err := p.getTableSize(); err != nil {
 		return err
@@ -103,10 +105,11 @@ func (p *psql) getTableSize() error {
 	}
 	fmt.Println(" Table Information")
 	for k, v := range tables {
-		var tableSize, indexSize string
+		var tableSize, indexSize int
 		fmt.Printf("  > Schema: %s\n", k)
 		if len(v) < 1 {
 			return errors.New("Schema has no table")
+			fmt.Println(tableSize, k)
 		}
 
 		for _, val := range v {
@@ -124,9 +127,10 @@ func (p *psql) getTableSize() error {
 			}
 			fmt.Printf("     Table: %s\n      Table Size: %s\n      Index Size: %s\n", val, tableSize, indexSize)
 
-			// if viper.GetBool("app.aws.service.cloudwatch.enabled") == true {
-			// 	tools.CW("PostgreSQL", "DB Name", "Megabytes", float64(size), "DB Size", p.DBName)
-			// }
+			if viper.GetBool("app.aws.service.cloudwatch.enabled") == true {
+				tools.CW("PostgreSQL", k, "Bytes", float64(tableSize), "Table Size", val)
+				tools.CW("PostgreSQL", k, "Bytes", float64(indexSize), "Table Index Size", val)
+			}
 		}
 	}
 	return nil
