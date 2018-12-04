@@ -10,7 +10,6 @@ import (
 	"github.com/bayupermadi/dbcheck/registry"
 	"github.com/lib/pq"
 	"github.com/spf13/viper"
-	"github.com/wjaoss/aws-wrapper/tools"
 )
 
 type psql struct {
@@ -45,7 +44,7 @@ func (p *psql) ActiveClient() error {
 	fmt.Println(info)
 
 	if viper.GetBool("app.aws.service.cloudwatch.enabled") == true {
-		tools.CW("PostgreSQL", "Hosts", "Count", float64(count), "Active Connection", host)
+		dbcheck.Graph("PostgreSQL", "Hosts", "Count", float64(count), "Active Connection", host)
 	}
 
 	maxConnection := viper.Get("database.pgsql.threshold.connection").(int)
@@ -66,7 +65,7 @@ func (p *psql) Health() error {
 	fmt.Print(info)
 
 	if viper.GetBool("app.aws.service.cloudwatch.enabled") == true {
-		tools.CW("PostgreSQL", "DB Name", "Bytes", float64(size), "DB Size", p.DBName)
+		dbcheck.Graph("PostgreSQL", "DB Name", "Bytes", float64(size), "DB Size", p.DBName)
 	}
 
 	maxDBSize := viper.Get("database.pgsql.threshold.db-size").(int)
@@ -109,15 +108,8 @@ func (p *psql) getTableSize() error {
 	if err != nil {
 		return err
 	}
-	//fmt.Println(" Table Information")
 	for k, v := range tables {
 		var tableSize, indexSize int
-		//fmt.Printf("  > Schema: %s\n", k)
-		if len(v) < 1 {
-			return errors.New("Schema has no table")
-			fmt.Println(tableSize, k)
-		}
-
 		for _, val := range v {
 			qTable := fmt.Sprintf("SELECT pg_total_relation_size('%s.%s') as tableSize", k, val)
 			qIndex := fmt.Sprintf("SELECT pg_indexes_size('%s.%s') as indexSize", k, val)
@@ -131,11 +123,10 @@ func (p *psql) getTableSize() error {
 				fmt.Println(err)
 				return err
 			}
-			//fmt.Printf("     Table: %s\n      Table Size: %d\n      Index Size: %d\n", val, tableSize, indexSize)
 
 			if viper.GetBool("app.aws.service.cloudwatch.enabled") == true {
-				tools.CW("PostgreSQL", "schema:"+k, "Bytes", float64(tableSize), "Table Size", val)
-				tools.CW("PostgreSQL", "schema:"+k, "Bytes", float64(indexSize), "Table Index Size", val)
+				dbcheck.Graph("PostgreSQL", "schema:"+k, "Bytes", float64(tableSize), "Table Size", val)
+				dbcheck.Graph("PostgreSQL", "schema:"+k, "Bytes", float64(indexSize), "Table Index Size", val)
 			}
 			maxTableSize := viper.Get("database.pgsql.threshold.table-size").(int)
 			maxIndexSize := viper.Get("database.pgsql.threshold.table-index-size").(int)

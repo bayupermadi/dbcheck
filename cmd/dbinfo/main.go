@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/bayupermadi/dbcheck"
 	_ "github.com/bayupermadi/dbcheck/db/bolt"
 	_ "github.com/bayupermadi/dbcheck/db/cassandra"
 	_ "github.com/bayupermadi/dbcheck/db/mongo"
@@ -56,12 +55,6 @@ func main() {
 	err := viper.ReadInConfig()
 	if err != nil {
 		panic(fmt.Errorf("fatal error config file: %s", err))
-	}
-
-	// open connection to aws
-	if viper.GetBool("app.aws.enabled") {
-		awsRegion := viper.Get("app.aws.credential.region").(string)
-		dbcheck.AwsSession(awsRegion)
 	}
 
 	pgMon := viper.GetBool("database.pgsql.enabled")

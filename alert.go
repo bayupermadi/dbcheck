@@ -7,6 +7,7 @@ import (
 
 	"github.com/spf13/viper"
 	"github.com/wjaoss/aws-wrapper/apps"
+	"github.com/wjaoss/aws-wrapper/tools"
 )
 
 func AlertCheck(value int, threshold int, monitoringType string) {
@@ -36,4 +37,11 @@ func AlertCheck(value int, threshold int, monitoringType string) {
 		msg := "noalert"
 		ioutil.WriteFile(monitoringType, []byte(msg), 0644)
 	}
+}
+
+func Graph(namespace string, unit string, measurement string, value float64, metric string, metricName string) {
+	// open connection to aws
+	awsRegion := viper.Get("app.aws.credential.region").(string)
+	AwsSession(awsRegion)
+	tools.CW(namespace, unit, measurement, value, metric, metricName)
 }
