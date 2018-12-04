@@ -109,10 +109,10 @@ func (p *psql) getTableSize() error {
 	if err != nil {
 		return err
 	}
-	fmt.Println(" Table Information")
+	//fmt.Println(" Table Information")
 	for k, v := range tables {
 		var tableSize, indexSize int
-		fmt.Printf("  > Schema: %s\n", k)
+		//fmt.Printf("  > Schema: %s\n", k)
 		if len(v) < 1 {
 			return errors.New("Schema has no table")
 			fmt.Println(tableSize, k)
@@ -131,7 +131,7 @@ func (p *psql) getTableSize() error {
 				fmt.Println(err)
 				return err
 			}
-			fmt.Printf("     Table: %s\n      Table Size: %d\n      Index Size: %d\n", val, tableSize, indexSize)
+			//fmt.Printf("     Table: %s\n      Table Size: %d\n      Index Size: %d\n", val, tableSize, indexSize)
 
 			if viper.GetBool("app.aws.service.cloudwatch.enabled") == true {
 				tools.CW("PostgreSQL", "schema:"+k, "Bytes", float64(tableSize), "Table Size", val)
