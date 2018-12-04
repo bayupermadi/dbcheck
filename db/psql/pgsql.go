@@ -48,6 +48,9 @@ func (p *psql) ActiveClient() error {
 		tools.CW("PostgreSQL", "Hosts", "Count", float64(count), "Active Connection", host)
 	}
 
+	maxConnection := viper.Get("database.pgsql.threshold.connection").(int)
+	dbcheck.AlertCheck(count, maxConnection, "PostgreSQL Total Connection ")
+
 	return nil
 }
 
@@ -65,6 +68,9 @@ func (p *psql) Health() error {
 	if viper.GetBool("app.aws.service.cloudwatch.enabled") == true {
 		tools.CW("PostgreSQL", "DB Name", "Bytes", float64(size), "DB Size", p.DBName)
 	}
+
+	maxDBSize := viper.Get("database.pgsql.threshold.db-size").(int)
+	dbcheck.AlertCheck(size, maxDBSize, "PostgreSQL DB Size "+p.DBName)
 
 	if err := p.getTableSize(); err != nil {
 		return err
@@ -125,12 +131,16 @@ func (p *psql) getTableSize() error {
 				fmt.Println(err)
 				return err
 			}
-			fmt.Printf("     Table: %s\n      Table Size: %s\n      Index Size: %s\n", val, tableSize, indexSize)
+			fmt.Printf("     Table: %s\n      Table Size: %d\n      Index Size: %d\n", val, tableSize, indexSize)
 
 			if viper.GetBool("app.aws.service.cloudwatch.enabled") == true {
-				tools.CW("PostgreSQL", k, "Bytes", float64(tableSize), "Table Size", val)
-				tools.CW("PostgreSQL", k, "Bytes", float64(indexSize), "Table Index Size", val)
+				tools.CW("PostgreSQL", "schema:"+k, "Bytes", float64(tableSize), "Table Size", val)
+				tools.CW("PostgreSQL", "schema:"+k, "Bytes", float64(indexSize), "Table Index Size", val)
 			}
+			maxTableSize := viper.Get("database.pgsql.threshold.table-size").(int)
+			maxIndexSize := viper.Get("database.pgsql.threshold.table-index-size").(int)
+			dbcheck.AlertCheck(tableSize, maxTableSize, "PostgreSQL Table size "+val)
+			dbcheck.AlertCheck(indexSize, maxIndexSize, "PostgreSQL Index Table size "+val)
 		}
 	}
 	return nil

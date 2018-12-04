@@ -13,4 +13,9 @@ database:
   pgsql:
     enabled: true
     uri: "postgres://webapp_user:12345678@192.168.1.203:5432/grafana?sslmode=require"
+    threshold:
+      connection: 0
+      db-size: 1000
+      table-size: 100
+      table-index-size: 10
 ---
