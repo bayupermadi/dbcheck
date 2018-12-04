@@ -2,6 +2,7 @@ package dbcheck
 
 import (
 	"fmt"
+	"strings"
 
 	"github.com/spf13/viper"
 	"github.com/wjaoss/aws-wrapper/apps"
@@ -15,6 +16,11 @@ func AlertCheck(value int, threshold int, monitoringType string) {
 		subject := viper.Get("app.aws.service.ses.subject").(string)
 		body := fmt.Sprintf("Current Value of "+monitoringType+" is %d", value)
 
-		apps.SES(sender, recipient, subject, body)
+		dest := strings.Split(recipient, ", ")
+		start := 0
+		for i := 0; i < len(dest); i++ {
+			start += i
+			apps.SES(sender, dest[start], subject, body)
+		}
 	}
 }
