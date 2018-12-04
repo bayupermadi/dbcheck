@@ -9,4 +9,8 @@ app:
     service:
       cloudwatch:
         enabled: true
+database:
+  pgsql:
+    enabled: true
+    uri: "postgres://webapp_user:12345678@192.168.1.203:5432/grafana?sslmode=require"
 ---

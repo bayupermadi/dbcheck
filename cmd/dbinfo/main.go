@@ -1,10 +1,7 @@
 package main
 
 import (
-	"flag"
 	"fmt"
-	"os"
-	"strings"
 
 	_ "github.com/bayupermadi/dbcheck/db/bolt"
 	_ "github.com/bayupermadi/dbcheck/db/cassandra"
@@ -50,25 +47,26 @@ func dbInfo(db string, host string, path string) {
 }
 
 func main() {
-	db := flag.String("db", "", "Specify your database server. Supported databases (key): redis, mongo, postgresql, mysql, cassandra, bolt, sqlite ")
-	host := flag.String("host", "", "Specify your database connection URI depending your server")
-	path := flag.String("path", "", "Specify your database path (used for bolt and sqlite)")
-	flag.Parse()
-	pathDB := []string{"sqlite", "bolt"}
-	hostDB := []string{"mysql", "postgresql", "mongo", "redis", "cassandra"}
-	for _, v := range pathDB {
-		if v == *db && strings.Contains(os.Args[3], "host") {
-			fmt.Printf("%s need a argument path (found %s)\n", *db, os.Args[3])
-			return
-		}
-	}
+	// db := flag.String("db", "", "Specify your database server. Supported databases (key): redis, mongo, postgresql, mysql, cassandra, bolt, sqlite ")
+	// host := flag.String("host", "", "Specify your database connection URI depending your server")
+	// path := flag.String("path", "", "Specify your database path (used for bolt and sqlite)")
+	// flag.Parse()
+	// pathDB := []string{"sqlite", "bolt"}
+	// hostDB := []string{"mysql", "postgresql", "mongo", "redis", "cassandra"}
+	// for _, v := range pathDB {
+	// 	if v == *db && strings.Contains(os.Args[3], "host") {
+	// 		fmt.Printf("%s need a argument path (found %s)\n", *db, os.Args[3])
+	// 		return
+	// 	}
+	// }
 
-	for _, v := range hostDB {
-		if v == *db && strings.Contains(os.Args[3], "path") {
-			fmt.Printf("%s need a argument host (found %s)\n", *db, os.Args[3])
-			return
-		}
-	}
+	// for _, v := range hostDB {
+	// 	if v == *db && strings.Contains(os.Args[3], "path") {
+	// 		fmt.Printf("%s need a argument host (found %s)\n", *db, os.Args[3])
+	// 		return
+	// 	}
+	// }
+	path := ""
 
 	// load configuration file
 	viper.SetConfigName("config")
@@ -87,6 +85,13 @@ func main() {
 		session.SetConfiguration(awsKeyID, awsSecretKey, awsRegion)
 	}
 
-	dbInfo(*db, *host, *path)
+	pgMon := viper.GetBool("database.pgsql.enabled")
+
+	if pgMon {
+		db := "postgresql"
+		host := viper.Get("database.pgsql.uri").(string)
+		fmt.Println(db, host)
+		dbInfo(db, host, path)
+	}
 
 }
