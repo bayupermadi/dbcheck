@@ -14,7 +14,6 @@ func AlertCheck(value int, threshold int, monitoringType string) {
 	sesRegion := viper.Get("app.aws.service.ses.region").(string)
 	if sesRegion != "" {
 		AwsSession(sesRegion)
-		fmt.Println("yes")
 	}
 	contents, _ := ioutil.ReadFile(monitoringType)
 	if value > threshold && sesService && string(contents) != "alert" {
